@@ -8,9 +8,9 @@ Set-StrictMode -Version latest
 #----------------------------------------------------------
 Try
 {
-  Import-Module ActiveDirectory -ErrorAction Stop
-  #Import-Module ADSync -ErrorAction Stop
-  Import-Module ImportExcel
+  Import-Module ActiveDirectory -ErrorAction Stop       # RSAT or Domain Controller
+  Import-Module ADSync -ErrorAction Stop                # Microsoft Azure Connect or similar sync tool (optional, comment out if not using cloud AD)
+  Import-Module ImportExcel -ErrorAction Stop           # Found on the PowerShell Gallery, install with Install-Module ImportExcel
 }
 Catch
 {
