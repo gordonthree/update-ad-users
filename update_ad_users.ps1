@@ -1,3 +1,4 @@
+# added to github
 # Description: This script will update user accounts in Active Directory based on an Excel spreadsheet.
 # ERROR REPORTING ALL
 Set-StrictMode -Version latest
@@ -40,7 +41,7 @@ Function Start-Commands
   # Sync-Azure  
 }
 
-function Capitalize-FirstLetter {
+function Convert-FirstLetterUpper {
   param (
       [string]$InputString
   )
@@ -229,7 +230,7 @@ Function Update-Users
           Try { 
             $newDn = (Get-ADUser -Identity $sam).DistinguishedName
             $subStrings = $sam.Split("_")
-            $subStrings[0] = Capitalize-FirstLetter -InputString $subStrings[0]
+            $subStrings[0] = Convert-FirstLetterUpper -InputString $subStrings[0]
             $newName = $params.givenName
 
             if ($subStrings[0] -ne "Fax") { $newName = $params.givenName + " " + $subStrings[0] }
