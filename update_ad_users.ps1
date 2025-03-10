@@ -106,13 +106,13 @@ Function Update-Users
       If (-not [string]::IsNullOrEmpty($_.Pager)) { $params.pager = $_.Pager.ToString() }
       If (-not [string]::IsNullOrEmpty($_.Title)) { $params.title = $_.Title.ToString() 
                                                     $params.description = $_.Title.ToString() } # copy title to description if it exists
-      If (-not [string]::IsNullOrEmpty($_.Department)) { $params.department = $_.Department.ToString()
-                                                         $params.description += " " + $_.Department.ToString() } # append department to description if it exists
+      If (-not [string]::IsNullOrEmpty($_.Department)) { $params.department = $_.Department.ToString() }
       If (-not [string]::IsNullOrEmpty($_.StreetAddress)) { $params.streetAddress = $_.StreetAddress.ToString() }
       If (-not [string]::IsNullOrEmpty($_.City)) { $params.l = $_.City.ToString() }
       If (-not [string]::IsNullOrEmpty($_.State)) { $params.st = $_.State.ToString() }
       If (-not [string]::IsNullOrEmpty($_.PostalCode)) { $params.postalCode = $_.PostalCode.ToString() }
       If (-not [string]::IsNullOrEmpty($_.Company)) { $params.company = $_.Company.ToString() }
+      If (-not [string]::IsNullOrEmpty($_.Office)) { $params.physicalDeliveryOfficeName = $_.Office.ToString() }
       #If (-not [string]::IsNullOrEmpty($_.Enabled)) { $params.Enabled = $_.Enabled }
 
       If ((($PSItem.Update.ToLower()) -eq "yes") -and ($exists)) # Update user account information
