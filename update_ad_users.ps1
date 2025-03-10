@@ -38,7 +38,7 @@ $phoneSysGrp    = "CN=Mitel Users,OU=Phone System,DC=mnstco,DC=net"
 Function Start-Commands
 {
   Update-Users
-  # Sync-Azure  
+  Sync-Azure  
 }
 
 function Convert-FirstLetterUpper {
