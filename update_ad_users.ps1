@@ -99,6 +99,11 @@ Function Update-Users
     }
     Else {
       $sam = $PSItem.SamAccountName
+      $userFunction = $PSItem.Update
+
+      Write-Host "[INFO] Processing user $($sam) function $($userFunction)`r`n"
+      "[INFO] Processing user $($sam) function $($PSItem.Update)" | Out-File $log -append
+
       Try {
         $exists = Get-ADUser -LDAPFilter "(sAMAccountName=$sam)"
       } Catch {
@@ -271,6 +276,10 @@ Function Update-Users
         }
 
       } # end of create user
+      elseif (($_.Update.ToLower() -eq "remove") -and (-not $exists)) { # command is delete but user doesn't exist
+        Write-warning "[WARNING]`t Unable to delete user $($sam); user does not exist`r`n"
+        "[WARNING]`t Unable to delete user $($sam); user does not exist`r`n" | Out-File $log -append
+      }
       elseif ((($_.Update.ToLower()) -eq "remove") -and ($exists)) # user exists and command is delete
       {
         Try {
