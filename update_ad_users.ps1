@@ -47,7 +47,7 @@ function New-RandomString {
   )
   $characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
   $randomString = ""
-  for ($i = 0; $i < $Length; $i++) {
+  for ($i = 0; $i -lt $Length; $i++) {
       $randomIndex = Get-Random -Minimum 0 -Maximum $characters.Length
       $randomChar = $characters[$randomIndex]
       $randomString += $randomChar
@@ -183,7 +183,7 @@ Function Update-Users
           else {
             ( $tempPass = New-RandomString -Length 16 )
           }
-          
+
           if ( $tempPass ) { Write-Host "[INFO] Temporary password set.`r`n"}
 
           $secPass = ConvertTo-SecureString -AsPlainText $tempPass -force
