@@ -41,6 +41,20 @@ Function Start-Commands
   Sync-Azure  
 }
 
+function New-RandomString {
+  param(
+      [int]$Length = 10
+  )
+  $characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+  $randomString = ""
+  for ($i = 0; $i < $Length; $i++) {
+      $randomIndex = Get-Random -Minimum 0 -Maximum $characters.Length
+      $randomChar = $characters[$randomIndex]
+      $randomString += $randomChar
+  }
+  return $randomString
+}
+
 function Convert-FirstLetterUpper {
   param (
       [string]$InputString
@@ -162,7 +176,17 @@ Function Update-Users
           Write-Host "[INFO]`t Creating user : $($sam)`r`n"
           "[INFO]`t Creating user : $($sam)" | Out-File $log -append
 
-          $secPass = ConvertTo-SecureString -AsPlainText $_.Password -force
+          $params
+          If (-not [string]::IsNullOrEmpty($_.Password)) { 
+            $tempPass = $_.Password 
+          }
+          else {
+            ( $tempPass = New-RandomString -Length 16 )
+          }
+          
+          if ( $tempPass ) { Write-Host "[INFO] Temporary password set.`r`n"}
+
+          $secPass = ConvertTo-SecureString -AsPlainText $tempPass -force
 
           # Write-Host "Password = $($_.Password) and setpass = $($setpass)"
           If (-not [string]::IsNullOrEmpty($_.Mail)) { $params.mail = $_.Mail.ToLower() }
