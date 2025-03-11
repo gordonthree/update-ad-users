@@ -176,12 +176,11 @@ Function Update-Users
           Write-Host "[INFO]`t Creating user : $($sam)`r`n"
           "[INFO]`t Creating user : $($sam)" | Out-File $log -append
 
-          $params
-          If (-not [string]::IsNullOrEmpty($_.Password)) { 
+          # $params
+          If (-not [string]::IsNullOrEmpty($_.Password)) {    # use password supplied by the Excel sheet
             $tempPass = $_.Password 
-          }
-          else {
-            ( $tempPass = New-RandomString -Length 16 )
+          } else {
+            ( $tempPass = New-RandomString -Length 16 )       # generate a random password
           }
 
           if ( $tempPass ) { Write-Host "[INFO] Temporary password set.`r`n"}
