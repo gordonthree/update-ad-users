@@ -95,6 +95,8 @@ Function Update-Users
       # DisplayName, SamAccountName, GivenName, Initials, Surname, mail, ipPhone, employeeType, TelephoneNumber, Pager, Title, Department, StreetAddress, City, State, PostalCode, Company, Enabled, Update
       $params = @{} # Initialize an empty hashtable
 
+      $specialAcct = $false
+
       # Add properties only if they are not null or empty
       If (-not [string]::IsNullOrEmpty($_.GivenName)) { $params.givenName = $_.GivenName.ToString() }
       If (-not [string]::IsNullOrEmpty($_.Initials)) { $params.initials = $_.Initials.ToString() }
@@ -114,6 +116,11 @@ Function Update-Users
       If (-not [string]::IsNullOrEmpty($_.Company)) { $params.company = $_.Company.ToString() }
       If (-not [string]::IsNullOrEmpty($_.Office)) { $params.physicalDeliveryOfficeName = $_.Office.ToString() }
       #If (-not [string]::IsNullOrEmpty($_.Enabled)) { $params.Enabled = $_.Enabled }
+
+      if (($sam -like "phone_*") -or ($sam -like "fax_*")) { # format description differently for phone and fax accounts
+        $specialAcct = $true
+        $params.description = "Extension " + $params.telephoneNumber
+      }
 
       If ((($PSItem.Update.ToLower()) -eq "yes") -and ($exists)) # Update user account information
       {
@@ -149,7 +156,7 @@ Function Update-Users
       elseif ((($_.Update.ToLower()) -eq "create") -and (!$exists)) # user does not exist and command is create
       {
         # Create User Account, set as much info as possible
-        $specialAcct = $false
+
         Try 
         { 
           Write-Host "[INFO]`t Creating user : $($sam)`r`n"
@@ -162,19 +169,13 @@ Function Update-Users
           If (-not [string]::IsNullOrEmpty($_.Mail)) { $params.userPrincipalName = $_.Mail.ToLower() }
 
           if (($sam -like "phone_*") -or ($sam -like "fax_*")) { # special accounts no password expiration, no password change required
-            $specialAcct = $true
-            $params.description = "Extension " + $params.telephoneNumber
-            #$params
-
             New-ADUser $sam -AccountPassword $secPass -ChangePasswordAtLogon $false -CannotChangePassword $true -PasswordNeverExpires $true -Enabled $true
           } else {
             $params.HomeDirectory = $($homeRoot + "\" + $sam)
             $params.HomeDrive = $homeDriv
 
-            New-ADUser $sam -ChangePasswordAtLogon $true -Enabled $true -AccountPassword $secPass
+            New-ADUser $sam -ChangePasswordAtLogon $true -AccountPassword $secPass -Enabled $true
           }
-
-          #$params
 
           # update the rest of the attributes
           Get-ADUser -Identity $sam | Set-ADUser -Add $params
