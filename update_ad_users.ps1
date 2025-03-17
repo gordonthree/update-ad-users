@@ -45,6 +45,8 @@ function New-RandomString {
   param(
       [int]$Length = 10
   )
+  
+  # first some letters and numbers
   $characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
   $randomString = ""
   for ($i = 0; $i -lt $Length; $i++) {
@@ -52,6 +54,16 @@ function New-RandomString {
       $randomChar = $characters[$randomIndex]
       $randomString += $randomChar
   }
+
+  # now numbers and punctuation
+  $characters = "0123456789!@#%^&(){}[]<>,.?/|\~+=-_"
+
+  for ($i = 0; $i -lt 4; $i++) {
+      $randomIndex = Get-Random -Minimum 0 -Maximum $characters.Length
+      $randomChar = $characters[$randomIndex]
+      $randomString += $randomChar
+  }
+
   return $randomString
 }
 
@@ -256,21 +268,20 @@ Function Update-Users
           Write-Host "[INFO]`t Moved special user $($sam) to Phone System OU`r`n" 
           "[INFO]`t Moved special user $($sam) to Phone System OU" | Out-File $log -append
 
+          # Rename the object to a good looking name (otherwise you see
+          # the 'ugly' shortened sAMAccountNames as a name in AD. This
+          # can't be set right away (as sAMAccountName) due to the 20
+          # character restriction
           Try { 
             $newDn = (Get-ADUser -Identity $sam).DistinguishedName
-            $subStrings = $sam.Split("_")
-            $subStrings[0] = Convert-FirstLetterUpper -InputString $subStrings[0]
-            $newName = $params.givenName
-
-            if ($subStrings[0] -ne "Fax") { $newName = $params.givenName + " " + $subStrings[0] }
-
-            Write-Host "[INFO]`t Updating name formatting in active directory for $($sam) to $($newName)`r`n"
-            "[INFO]`t Updating name formatting in active directory for $($sam) to $($newName)" | Out-File $log -append
+    
+            Write-Host "[INFO]`t Updating name formatting in active directory for $($sam) to $($params.sn + ", " + $params.givenName)`r`n"
+            "[INFO]`t Updating name formatting in active directory for $($sam) to $($params.sn + ", " + $params.givenName)" | Out-File $log -append
   
-            Rename-ADObject -Identity $newDn -NewName $newName
+            Rename-ADObject -Identity $newDn -NewName ($params.sn + ", " + $params.givenName)  
             }
-          Catch { Write-Error "Couldn't rename user $($sam) : $($_.Exception.Message)`r`n"
-                  "[ERROR]`t Couldn't rename user $($sam) : $($_.Exception.Message)" | Out-File $log -Append
+          Catch { Write-Error "Couldn't rename user : $($_.Exception.Message)`r`n"
+                  "[ERROR]`t Couldn't rename user : $($_.Exception.Message)" | Out-File $log -Append
                 }
 
         }
