@@ -102,7 +102,7 @@ Function Sync-Azure
 
 Function Update-Users
 {
-  $i              = 1
+  $i = 1
   Import-Excel -Path $userdb | ForEach-Object {
     If ($_.SamAccountName -eq "") # skip this record if no account name specified 
     {
