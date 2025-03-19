@@ -159,8 +159,39 @@ Function Update-Users
           Try {
               # Update User Account, only change info that won't impact login or email 
               #$params
-              Set-ADUser -Identity $sam -Replace $params
+              
+              $user = get-aduser -identity $sam -Properties * # store all properities of user object for later use
+
+              Set-ADUser -Identity $sam -Replace $params # undate what we can
+
               if (-not [string]::IsNullOrEmpty($_.TelephoneNumber)) { Add-ADGroupMember -Identity $phoneSysGrp -Members $sam }
+
+              # test if certain attributes are set for the user, but empty in the update, and clear them for the user
+              If ((-not [string]::IsNullOrEmpty($user.TelephoneNumber)) -and ([string]::IsNullOrEmpty($_.TelephoneNumber))) {
+                $user | Set-ADUser -Clear telephoneNumber
+                Write-Host "[INFO]`t Cleared telephoneNumber for user: $($sam)`r`n" 
+                "[INFO]`t Cleared telephoneNumber for user: $($sam)" | Out-File $log -append
+              }
+
+              If ((-not [string]::IsNullOrEmpty($user.Pager)) -and ([string]::IsNullOrEmpty($_.Pager))) {
+                $user | Set-ADUser -Clear pager
+                Write-Host "[INFO]`t Cleared pager for user: $($sam)`r`n" 
+                "[INFO]`t Cleared pager for user: $($sam)" | Out-File $log -append
+              }
+
+              If ((-not [string]::IsNullOrEmpty($user.ipPhone)) -and ([string]::IsNullOrEmpty($_.ipPhone))) {
+                $user | Set-ADUser -Clear ipPhone
+                Write-Host "[INFO]`t Cleared ipPhone for user: $($sam)`r`n" 
+                "[INFO]`t Cleared ipPhone for user: $($sam)" | Out-File $log -append
+              }
+
+              If ((-not [string]::IsNullOrEmpty($user.Office)) -and ([string]::IsNullOrEmpty($_.Office))) {
+                $user | Set-ADUser -Clear office
+                Write-Host "[INFO]`t Cleared office for user: $($sam)`r`n" 
+                "[INFO]`t Cleared office for user: $($sam)" | Out-File $log -append
+              }
+
+
               Write-Host "[INFO]`t updated user: $($sam)`r`n"
               "[INFO]`t Updated user: $($sam)" | Out-File $log -append
           }
